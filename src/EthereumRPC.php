@@ -29,8 +29,8 @@ use HttpClient\Response\JSONResponse;
  */
 class EthereumRPC
 {
-    public const VERSION = "1.16.1";
-    public const SCALE = 8;
+    public const VERSION = "1.17.1";
+    public const SCALE   = 8;
 
     /** @var string */
     private $host;
@@ -43,20 +43,26 @@ class EthereumRPC
 
     /** @var Eth */
     private $eth;
-    
+
     /** @var Personal */
     private $personal;
 
     /**
      * EthereumRPC constructor.
-     * @param string $host
+     *
+     * @param string   $host
      * @param int|null $port
      */
-    public function __construct(string $host, ?int $port = null)
+    public function __construct(string $host, ?int $port = null, ?string $protocol = 'http')
     {
         $this->host = $host;
         $this->port = $port;
         $this->ssl = false;
+        if ($protocol === 'https') {
+            $this->ssl = true;
+        } else {
+            $this->ssl = false;
+        }
         $this->eth = new Eth($this);
         $this->personal = new Personal($this);
     }
@@ -87,6 +93,7 @@ class EthereumRPC
 
     /**
      * @param null|string $endPoint
+     *
      * @return string
      */
     private function url(?string $endPoint = null): string
@@ -102,6 +109,7 @@ class EthereumRPC
 
     /**
      * @param Request $request
+     *
      * @return Request
      */
     private function prepare(Request $request): Request
@@ -110,10 +118,11 @@ class EthereumRPC
     }
 
     /**
-     * @param string $command
+     * @param string      $command
      * @param null|string $endpoint
-     * @param array|null $params
+     * @param array|null  $params
      * @param null|string $method
+     *
      * @return JSONResponse
      * @throws ConnectionException
      * @throws GethException
@@ -129,9 +138,9 @@ class EthereumRPC
         // Payload
         $request->payload([
             "jsonrpc" => "2.0",
-            "id" => $id,
-            "method" => $command,
-            "params" => $params ?? []
+            "id"      => $id,
+            "method"  => $command,
+            "params"  => $params ?? [],
         ]);
 
         // Send JSON RPC Request to Bitcoin daemon
